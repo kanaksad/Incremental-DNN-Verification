@@ -63,6 +63,12 @@ CIFAR_RESNET_20 = "smoothing_models/cifar10/resnet20/noise_sigma/checkpoint.pth.
 CIFAR_RESNET_110 = "smoothing_models/cifar10/resnet110/noise_sigma/checkpoint.pth.tar"
 RESNET50 = "smoothing_models/imagenet/resnet50/noise_sigma/checkpoint.pth.tar"
 
+# Model Repair Experimentation
+MNIST_3_100_UNREPAIRED = "aprnn/unrepaired/mnist_relu_3_100.pth"
+MNIST_3_100_REPAIRED = "aprnn/repaired/mnist_relu_3_100.pth"
+MNIST_9_100_UNREPAIRED = "aprnn/unrepaired/mnist_relu_9_100.pth"
+MNIST_9_100_REPAIRED = "aprnn/repaired/mnist_relu_9_100.pth"
+
 def ACASXU(i, j):
     net_name = "acasxu/nets/ACASXU_run2a_" + str(i) + "_" + str(j) + "_batch_2000.onnx"
     return net_name

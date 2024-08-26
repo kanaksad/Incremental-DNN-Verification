@@ -10,7 +10,7 @@ from nnverify.training.models.wide_resnet_imagenet64 import *
 from nnverify.training.models.wide_resnet_cifar import *
 from nnverify.training.models.resnet18 import *
 from nnverify.training.models.vnncomp_resnet import resnet2b as vnncomp_resnet2b, resnet4b as vnncomp_resnet4b
-from nnverify.training.models.model_defs import mnist_6_100, mnist_conv_small, mnist_conv_big
+from nnverify.training.models.model_defs import mnist_3_100, mnist_6_100, mnist_9_100, mnist_conv_small, mnist_conv_big
 from nnverify.training.models.cifar_resnet import resnet
 
 Models = {
@@ -42,7 +42,9 @@ Models = {
     'cifar_base_kw': cifar_base_kw,
     'cifar_wide_kw': cifar_wide_kw,
     'cifar_deep_kw': cifar_deep_kw,
+    'mnist_relu_3_100': mnist_3_100,
     'mnist_6_100_nat': mnist_6_100,
+    'mnist_relu_9_100': mnist_9_100,
     'mnist_conv_small_nat': mnist_conv_small,
     'mnist_conv_big_diffai': mnist_conv_big,
     'resnet_cifar': resnet,

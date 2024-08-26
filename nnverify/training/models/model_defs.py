@@ -617,6 +617,21 @@ def mnist_conv_big(in_ch=1, in_dim=28):
     )
     return model
 
+def mnist_3_100():
+    model = nn.Sequential(
+        Flatten(),
+        nn.Linear(784,100),
+        nn.ReLU(),
+        nn.Linear(100,100),
+        nn.ReLU(),
+        nn.Linear(100,100),
+        nn.ReLU(),
+        nn.Linear(100,10),
+        # nn.ReLU(),
+        # nn.Linear(10,10, bias=False)
+    )
+    return model
+
 
 def mnist_6_100(in_ch=1, in_dim=28):
     model = nn.Sequential(

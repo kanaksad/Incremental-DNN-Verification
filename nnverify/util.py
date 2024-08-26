@@ -29,6 +29,11 @@ from torchvision.models.resnet import resnet50
 import torch.backends.cudnn as cudnn
 from torch.nn.functional import interpolate
 
+def adjust_key_name(key):
+    parts = key.split('.')
+    if parts[0].isdigit():
+        parts[0] = str(int(parts[0]) + 1)
+    return '.'.join(parts)
 
 def get_torch_net(net_file, dataset, device='cpu'):
     net_name = get_net_name(net_file)
@@ -37,7 +42,10 @@ def get_torch_net(net_file, dataset, device='cpu'):
         return get_torch_test_net(net_name, net_file)
 
     if dataset == Dataset.MNIST:
-        model = models.Models[net_name](in_ch=1, in_dim=28)
+        if net_name == 'mnist_relu_9_100' or net_name == 'mnist_relu_3_100':
+            model = models.Models[net_name]()
+        else:
+            model = models.Models[net_name](in_ch=1, in_dim=28)
     elif dataset == Dataset.IMAGENET:
         model = get_architecture(net_file, dataset)
     elif dataset == Dataset.CIFAR10 or dataset == Dataset.OVAL_CIFAR:
@@ -53,7 +61,16 @@ def get_torch_net(net_file, dataset, device='cpu'):
     elif 'eran' in net_file:
         model.load_state_dict(torch.load(net_file, map_location=torch.device(device))['state_dict'][0])
     else:
-        model.load_state_dict(torch.load(net_file, map_location=torch.device(device))['state_dict'])
+        checkpoint = torch.load(net_file, map_location=torch.device(device))
+        if 'state_dict' in checkpoint:
+            model.load_state_dict(checkpoint['state_dict'])
+        else:
+            new_state_dict = {}
+            for k, v in checkpoint.items():
+                new_key = adjust_key_name(k)
+                new_state_dict[new_key] = v
+    
+    model.load_state_dict(new_state_dict)
 
     return model
 
