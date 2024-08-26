@@ -1,0 +1,4 @@
+nnverify/nets/
+data/
+results/
+*/**/__pycache__/**
