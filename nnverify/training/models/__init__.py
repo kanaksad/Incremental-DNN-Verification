@@ -45,6 +45,7 @@ Models = {
     'mnist_relu_3_100': mnist_3_100,
     'mnist_6_100_nat': mnist_6_100,
     'mnist_relu_9_100': mnist_9_100,
+    'mnist_relu_9_100_polytope': mnist_9_100,
     'mnist_conv_small_nat': mnist_conv_small,
     'mnist_conv_big_diffai': mnist_conv_big,
     'resnet_cifar': resnet,

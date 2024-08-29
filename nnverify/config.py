@@ -68,6 +68,7 @@ MNIST_3_100_UNREPAIRED = "aprnn/unrepaired/mnist_relu_3_100.pth"
 MNIST_3_100_REPAIRED = "aprnn/repaired/mnist_relu_3_100.pth"
 MNIST_9_100_UNREPAIRED = "aprnn/unrepaired/mnist_relu_9_100.pth"
 MNIST_9_100_REPAIRED = "aprnn/repaired/mnist_relu_9_100.pth"
+MNIST_9_100_REPAIRED_PT = "aprnn/repaired/mnist_relu_9_100_polytope.pth"
 
 def ACASXU(i, j):
     net_name = "acasxu/nets/ACASXU_run2a_" + str(i) + "_" + str(j) + "_batch_2000.onnx"

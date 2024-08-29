@@ -322,12 +322,15 @@ class TestRandomizedSmoothing(TestCase):
         args = SmoothingArgs(net=config.RESNET50, dataset=Dataset.IMAGENET, count=1, alpha=0.1, batch=100, sigma=0.25, N0=1000, N=100000)
         SmoothingAnalyzer(args).certify()
 
-class TestMNISTLinfRepair(TestCase):
+class TestMNISTRepair(TestCase):
     def test_mlp_unrepaired_9_100(self):
         args = config.Args(net=config.MNIST_9_100_UNREPAIRED, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.01)
         Analyzer(args).run_analyzer()
     def test_mlp_repaired_9_100(self):
         args = config.Args(net=config.MNIST_9_100_REPAIRED, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.01)
+        Analyzer(args).run_analyzer()
+    def test_mlp_repaired_9_100_polytope(self):
+        args = config.Args(net=config.MNIST_9_100_REPAIRED_PT, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.01)
         Analyzer(args).run_analyzer()
     def test_mlp_unrepaired_3_100(self):
         args = config.Args(net=config.MNIST_3_100_UNREPAIRED, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0)

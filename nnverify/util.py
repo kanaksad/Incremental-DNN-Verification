@@ -42,7 +42,7 @@ def get_torch_net(net_file, dataset, device='cpu'):
         return get_torch_test_net(net_name, net_file)
 
     if dataset == Dataset.MNIST:
-        if net_name == 'mnist_relu_9_100' or net_name == 'mnist_relu_3_100':
+        if 'mnist_relu_9_100' in net_name or net_name == 'mnist_relu_3_100':
             model = models.Models[net_name]()
         else:
             model = models.Models[net_name](in_ch=1, in_dim=28)
