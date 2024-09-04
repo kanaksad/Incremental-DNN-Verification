@@ -324,13 +324,13 @@ class TestRandomizedSmoothing(TestCase):
 
 class TestMNISTRepair(TestCase):
     def test_mlp_unrepaired_9_100(self):
-        args = config.Args(net=config.MNIST_9_100_UNREPAIRED, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.01)
+        args = config.Args(net=config.MNIST_9_100_UNREPAIRED, domain=Domain.DEEPPOLY, dataset=Dataset.MNIST, eps=0.01)
         Analyzer(args).run_analyzer()
     def test_mlp_repaired_9_100(self):
         args = config.Args(net=config.MNIST_9_100_REPAIRED, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.01)
         Analyzer(args).run_analyzer()
     def test_mlp_repaired_9_100_polytope(self):
-        args = config.Args(net=config.MNIST_9_100_REPAIRED_PT, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.01)
+        args = config.Args(net=config.MNIST_9_100_REPAIRED_PT, domain=Domain.DEEPPOLY, dataset=Dataset.MNIST, eps=0.01)
         Analyzer(args).run_analyzer()
     def test_mlp_unrepaired_3_100(self):
         args = config.Args(net=config.MNIST_3_100_UNREPAIRED, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0)

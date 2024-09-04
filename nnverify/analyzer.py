@@ -40,18 +40,20 @@ class Analyzer:
 
         # Check if classified correctly
         if nnverify.attack.check_adversarial(prop.input, self.net, prop):
-            return Status.MISS_CLASSIFIED, tree_size
+            return Status.MISS_CLASSIFIED, tree_size, torch.empty(0), torch.empty(0)
 
         # Check Adv Example with an Attack
         if self.args.attack is not None:
             adv = self.args.attack.search_adversarial(self.net, prop, self.args)
             if nnverify.attack.check_adversarial(adv, self.net, prop):
-                return Status.ADV_EXAMPLE, tree_size
+                return Status.ADV_EXAMPLE, tree_size, torch.empty(0), torch.empty(0)
 
         if self.args.split is None:
-            status = self.analyze_no_split()
+            status, lb, ub = self.analyze_no_split()
+            # print('LB: ', lb)
+            # print('UB:', ub)
         elif self.args.split is None:
-            status = self.analyze_no_split_adv_ex(prop)
+            status, lb, ub = self.analyze_no_split_adv_ex(prop)
         else:
             bnb_analyzer = bnb.BnB(self.net, self.transformer, prop, self.args, self.template_store)
             if self.args.parallel:
@@ -61,7 +63,7 @@ class Analyzer:
 
             status = bnb_analyzer.global_status
             tree_size = bnb_analyzer.tree_size
-        return status, tree_size
+        return status, tree_size, lb, ub
 
     def update_transformer(self, prop):
         if self.transformer is not None and 'update_input' in dir(self.transformer) \
@@ -79,15 +81,16 @@ class Analyzer:
         elif adv_ex is not None:
             status = Status.ADV_EXAMPLE
         print(lb)
-        return status
+        return status, lb, self.transformer.compute_ub()
 
     def analyze_no_split(self):
         lb = self.transformer.compute_lb()
         status = Status.UNKNOWN
         if torch.all(lb >= 0):
             status = Status.VERIFIED
-        print('LB: ', lb)
-        return status
+        # print('LB: ', lb)
+        # print('UB:', self.transformer.compute_ub())
+        return status, lb, self.transformer.compute_ub()
 
     def run_analyzer(self):
         """
@@ -98,8 +101,10 @@ class Analyzer:
 
         props, inputs = specs.get_specs(self.args.dataset, spec_type=self.args.spec_type, count=self.args.count, eps=self.args.eps)
 
-        results = self.analyze_domain(props)
-
+        results, lbs, ubs = self.analyze_domain(props)
+        lbs_ubs = {'lbs': lbs, 'ubs': ubs}
+        file_name = './results/' + (str(self.args.net) + str(self.args.domain)).replace('/', '-') + '.pt'
+        torch.save(lbs_ubs, file_name)
         results.compute_stats()
         print('Results: ', results.output_count)
         print('Average time:', results.avg_time)
@@ -116,20 +121,26 @@ class Analyzer:
 
     def analyze_domain(self, props):
         results = Results(self.args)
+        lbs = []
+        ubs = []
         for i in range(len(props)):
             print("************************** Proof %d *****************************" % (i+1))
             num_clauses = props[i].get_input_clause_count()
             clause_ver_status = []
             ver_start_time = time.time()
-
+            # print('Number of clauses: ', num_clauses)
             for j in range(num_clauses):
-                cl_status, tree_size = self.analyze(props[i].get_input_clause(j))
+                cl_status, tree_size, lb, ub = self.analyze(props[i].get_input_clause(j))
                 clause_ver_status.append(cl_status)
 
             status = self.extract_status(clause_ver_status)
             print(status)
+            print('LB: ', lb)
+            lbs.append(lb)
+            print('UB:', ub)
+            ubs.append(ub)
             ver_time = time.time() - ver_start_time
             results.add_result(Result(ver_time, status, tree_size=tree_size))
 
-        return results
+        return results, lbs, ubs
 
