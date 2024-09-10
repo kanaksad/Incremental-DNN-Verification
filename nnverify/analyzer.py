@@ -63,6 +63,8 @@ class Analyzer:
 
             status = bnb_analyzer.global_status
             tree_size = bnb_analyzer.tree_size
+            lb = bnb_analyzer.transformer.lower_bounds[-1]
+            ub = bnb_analyzer.transformer.upper_bounds[-1]
         return status, tree_size, lb, ub
 
     def update_transformer(self, prop):
@@ -135,9 +137,9 @@ class Analyzer:
 
             status = self.extract_status(clause_ver_status)
             print(status)
-            print('LB: ', lb)
+            # print('LB: ', lb)
             lbs.append(lb)
-            print('UB:', ub)
+            # print('UB:', ub)
             ubs.append(ub)
             ver_time = time.time() - ver_start_time
             results.add_result(Result(ver_time, status, tree_size=tree_size))

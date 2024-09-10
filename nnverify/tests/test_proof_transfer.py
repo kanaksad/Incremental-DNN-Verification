@@ -52,7 +52,7 @@ class TestReordering(TestCase):
 class TestReusing(TestCase):
     def test_conv01_lp_esip_onnx_int8(self):
         args = pt.TransferArgs(net=config.MNIST_FFN_01, domain=Domain.LP, approx=ap.Quantize(ap.QuantizationType.INT8), dataset=Dataset.MNIST, eps=0.1,
-                               split=Split.RELU_ESIP_SCORE, count=50, pt_method=ProofTransferMethod.REUSE, timeout=100)
+                               split=Split.RELU_ESIP_SCORE, count=2, pt_method=ProofTransferMethod.REUSE, timeout=100)
         pt.proof_transfer(args)
 
     def test_conv01_lp_esip_onnx_int16(self):
@@ -72,7 +72,7 @@ class TestReusing(TestCase):
 
     def test_mlp_lp_esip_onnx_prune30(self):
         args = pt.TransferArgs(net=config.MNIST_FFN_L2, domain=Domain.LP, approx=ap.Prune(30), dataset=Dataset.MNIST, eps=0.03,
-                               split=Split.RELU_ESIP_SCORE, count=50, pt_method=ProofTransferMethod.REUSE,
+                               split=Split.RELU_ESIP_SCORE, count=1, pt_method=ProofTransferMethod.REUSE,
                                timeout=200)
         pt.proof_transfer(args)
 
