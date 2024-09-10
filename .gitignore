@@ -9,3 +9,4 @@ dist/
 build/
 model.ilp
 nn_verify.egg-info/
+*.png
