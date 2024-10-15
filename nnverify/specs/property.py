@@ -4,7 +4,7 @@ from nnverify.specs.out_spec import OutSpecType
 
 class Property:
     def __init__(self, input_lbs, input_ubs, inp_type, out_constr, dataset, input=None):
-        if inp_type == InputSpecType.LINF:
+        if inp_type == InputSpecType.LINF or inp_type == InputSpecType.L2:
             self.input_specs = [InputSpec(input_lbs, input_ubs, out_constr, dataset, input=input)]
         # Since the properties in this case can be conjunctive
         elif inp_type == InputSpecType.PATCH:

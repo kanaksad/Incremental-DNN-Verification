@@ -173,6 +173,12 @@ def get_specs(dataset, spec_type=InputSpecType.LINF, eps=0.01, count=None):
             testloader = prepare_data(dataset, batch_size=count)
             inputs, labels = next(iter(testloader))
             props = get_linf_spec(inputs, labels, eps, dataset)
+        elif spec_type == InputSpecType.L2:
+            if count is None:
+                count = 100
+            testloader = prepare_data(dataset, batch_size=count)
+            inputs, labels = next(iter(testloader))
+            props = get_l2_spec(inputs, labels, eps, dataset)
         elif spec_type == InputSpecType.PATCH:
             if count is None:
                 count = 10
@@ -247,6 +253,36 @@ def get_linf_spec(inputs, labels, eps, dataset):
         properties.append(Property(ilb, iub, InputSpecType.LINF, out_constr, dataset, input=image))
 
     return properties
+
+
+def get_l2_spec(inputs, labels, eps, dataset):
+    properties = []
+
+    mean, std = util.get_mean_std(dataset)
+    mean = mean.float()
+    std = std.float()
+
+    for i in range(len(inputs)):
+        image = inputs[i].float()  
+        image_norm = (image - mean) / std
+
+        perturbation = eps * torch.ones_like(image_norm) 
+        norm_factor = torch.norm(perturbation.reshape(-1), p=2)
+
+        perturbation = (perturbation / norm_factor) * eps
+
+        ilb = torch.clamp(image_norm - perturbation, min=0., max=1.)
+        iub = torch.clamp(image_norm + perturbation, min=0., max=1.)
+
+        ilb = ilb.reshape(-1)
+        iub = iub.reshape(-1)
+
+        out_constr = Constraint(OutSpecType.LOCAL_ROBUST, label=labels[i])
+
+        properties.append(Property(ilb, iub, InputSpecType.L2, out_constr, dataset, input=image_norm))
+
+    return properties
+
 
 
 def get_patch_specs(inputs, labels, eps, dataset, p_width=2, p_length=2):

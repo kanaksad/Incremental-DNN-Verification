@@ -14,6 +14,7 @@ class InputSpecType(Enum):
     LINF = 1
     PATCH = 2
     GLOBAL = 3
+    L2 = 4
 
 
 class InputSpec(object):
