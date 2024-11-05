@@ -1,6 +1,6 @@
 import torch
 from torch.nn import functional as F
-
+from nnverify.common import Status
 
 class BoxTransformer:
     def __init__(self, prop, complete=False):
@@ -178,7 +178,11 @@ class BoxTransformer:
         self.set_bound(out_lb, out_ub)
 
     def verify_robustness(self, y, true_label):
-        pass
+        lb = self.compute_lb()
+        status = Status.UNKNOWN
+        if torch.all(lb >= 0):
+            status = Status.VERIFIED
+        return status
 
 
 def absmul(lb, ub, weight, bias, down = True):

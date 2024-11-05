@@ -347,3 +347,58 @@ class TestMNISTRepair(TestCase):
     def test_mlp_repaired_3_100(self):
         args = config.Args(net=config.MNIST_3_100_REPAIRED, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0)
         Analyzer(args).run_analyzer()
+        
+class TestMNISTIncremental(TestCase):
+    def test_mnist_base_diffai(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.001)
+        Analyzer(args).run_analyzer()
+        
+    def test_mnist_base_diffai_first_block(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100_FIRST_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.001)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_diffai_second_block(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100_SECOND_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.001)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_diffai_third_block(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100_THIRD_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.001)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_diffai_forth_block(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100_FORTH_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.001)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_diffai_fifth_block(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100_FIFTH_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_diffai_all_block(self):
+        args = config.Args(net=config.MNIST_DIFFAI_5_100_ALL_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.001)
+        Analyzer(args).run_analyzer()
+    
+    
+    def test_mnist_base_pgd_1(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_1, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    
+    def test_mnist_base_pgd_3(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_first_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_FIRST_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_second_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_SECOND_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_third_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_THIRD_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_forth_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_FORTH_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_fifth_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_FIFTH_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_sixth_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_SIXTH_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    def test_mnist_base_pgd_3_all_block(self):
+        args = config.Args(net=config.MNIST_PGD_6_500_3_ALL_BLOCK, domain=Domain.DEEPZ, dataset=Dataset.MNIST, eps=0.015)
+        Analyzer(args).run_analyzer()
+    

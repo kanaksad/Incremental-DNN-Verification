@@ -11,7 +11,7 @@ from nnverify import config
 from nnverify.common import Status
 from nnverify.specs.out_spec import OutSpecType
 from nnverify.common.result import Result, Results
-from nnverify.proof_transfer.template import TemplateStore
+from nnverify.proof_transfer.templateFANC import TemplateStoreFANC
 from nnverify.domains import build_transformer, get_domain_transformer
 
 
@@ -32,7 +32,7 @@ class Analyzer:
         if self.net is None:
             self.net = util.get_net(self.args.net, self.args.dataset)
         if self.template_store is None:
-            self.template_store = TemplateStore()
+            self.template_store = TemplateStoreFANC()
 
     def analyze(self, prop):
         self.update_transformer(prop)
@@ -40,20 +40,22 @@ class Analyzer:
 
         # Check if classified correctly
         if nnverify.attack.check_adversarial(prop.input, self.net, prop):
-            return Status.MISS_CLASSIFIED, tree_size, torch.empty(0), torch.empty(0)
+            return Status.MISS_CLASSIFIED, tree_size
 
         # Check Adv Example with an Attack
         if self.args.attack is not None:
             adv = self.args.attack.search_adversarial(self.net, prop, self.args)
             if nnverify.attack.check_adversarial(adv, self.net, prop):
-                return Status.ADV_EXAMPLE, tree_size, torch.empty(0), torch.empty(0)
+                return Status.ADV_EXAMPLE, tree_size
 
         if self.args.split is None:
-            status, lb, ub = self.analyze_no_split()
-            # print('LB: ', lb)
+            status = self.analyze_no_split()
+            # if status is verified, take bounds at layer k and see if we can create a template from it.
+            
+            print(self.transformer)
             # print('UB:', ub)
         elif self.args.split is None:
-            status, lb, ub = self.analyze_no_split_adv_ex(prop)
+            status = self.analyze_no_split_adv_ex(prop)
         else:
             bnb_analyzer = bnb.BnB(self.net, self.transformer, prop, self.args, self.template_store)
             if self.args.parallel:
@@ -63,16 +65,16 @@ class Analyzer:
 
             status = bnb_analyzer.global_status
             tree_size = bnb_analyzer.tree_size
-            lb = bnb_analyzer.transformer.lower_bounds[-1]
-            ub = bnb_analyzer.transformer.upper_bounds[-1]
-        return status, tree_size, lb, ub
+            # lb = bnb_analyzer.transformer.lower_bounds[-1]
+            # ub = bnb_analyzer.transformer.upper_bounds[-1]
+        return status, tree_size
 
     def update_transformer(self, prop):
         if self.transformer is not None and 'update_input' in dir(self.transformer) \
                 and prop.out_constr.constr_type == OutSpecType.LOCAL_ROBUST:
             self.transformer.update_input(prop)
         else:
-            self.transformer = get_domain_transformer(self.args, self.net, prop, complete=True)
+            self.transformer = get_domain_transformer(self.args, self.net, prop, complete=False)
 
     def analyze_no_split_adv_ex(self, prop):
         # TODO: handle feasibility
@@ -82,8 +84,8 @@ class Analyzer:
             status = Status.VERIFIED
         elif adv_ex is not None:
             status = Status.ADV_EXAMPLE
-        print(lb)
-        return status, lb, self.transformer.compute_ub()
+        # print(lb)
+        return status
 
     def analyze_no_split(self):
         lb = self.transformer.compute_lb()
@@ -92,7 +94,7 @@ class Analyzer:
             status = Status.VERIFIED
         # print('LB: ', lb)
         # print('UB:', self.transformer.compute_ub())
-        return status, lb, self.transformer.compute_ub()
+        return status
 
     def run_analyzer(self):
         """
@@ -103,10 +105,10 @@ class Analyzer:
 
         props, inputs = specs.get_specs(self.args.dataset, spec_type=self.args.spec_type, count=self.args.count, eps=self.args.eps)
 
-        results, lbs, ubs = self.analyze_domain(props)
-        lbs_ubs = {'lbs': lbs, 'ubs': ubs}
-        file_name = './results/' + (str(self.args.net) + str(self.args.domain)).replace('/', '-') + '.pt'
-        torch.save(lbs_ubs, file_name)
+        results = self.analyze_domain(props)
+        # lbs_ubs = {'lbs': lbs, 'ubs': ubs}
+        # file_name = './results/' + (str(self.args.net) + str(self.args.domain)).replace('/', '-') + '.pt'
+        # torch.save(lbs_ubs, file_name)
         results.compute_stats()
         print('Results: ', results.output_count)
         print('Average time:', results.avg_time)
@@ -123,8 +125,8 @@ class Analyzer:
 
     def analyze_domain(self, props):
         results = Results(self.args)
-        lbs = []
-        ubs = []
+        # lbs = []
+        # ubs = []
         for i in range(len(props)):
             print("************************** Proof %d *****************************" % (i+1))
             num_clauses = props[i].get_input_clause_count()
@@ -132,17 +134,17 @@ class Analyzer:
             ver_start_time = time.time()
             # print('Number of clauses: ', num_clauses)
             for j in range(num_clauses):
-                cl_status, tree_size, lb, ub = self.analyze(props[i].get_input_clause(j))
+                cl_status, tree_size = self.analyze(props[i].get_input_clause(j))
                 clause_ver_status.append(cl_status)
 
             status = self.extract_status(clause_ver_status)
             print(status)
             # print('LB: ', lb)
-            lbs.append(lb)
+            # lbs.append(lb)
             # print('UB:', ub)
-            ubs.append(ub)
+            # ubs.append(ub)
             ver_time = time.time() - ver_start_time
             results.add_result(Result(ver_time, status, tree_size=tree_size))
 
-        return results, lbs, ubs
+        return results
 

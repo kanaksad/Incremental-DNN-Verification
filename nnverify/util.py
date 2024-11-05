@@ -67,16 +67,19 @@ def get_torch_net(net_file, dataset, device='cpu'):
         else:
             new_state_dict = {}
             for k, v in checkpoint.items():
-                new_key = adjust_key_name(k)
+                # Adjust key names for non-6x500 models
+                new_key = adjust_key_name(k)  # Ensure `adjust_key_name` is defined elsewhere
                 new_state_dict[new_key] = v
-    
-    model.load_state_dict(new_state_dict)
+
+            model.load_state_dict(new_state_dict)
 
     return model
 
 def get_net_name(net_file):
     if 'pth.tar' in net_file:
         net_name = net_file.split('/')[-1].split('_')[0]
+    elif 'model_brightness_' or 'ffnnRELU__PGDK_w_0.0078_6_500' in net_file:
+        net_name = 'cifar10_6x500'
     else:
         net_name = net_file.split('/')[-1].split('.')[-2]
     return net_name

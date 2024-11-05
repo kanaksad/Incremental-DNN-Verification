@@ -12,6 +12,7 @@ from nnverify.training.models.resnet18 import *
 from nnverify.training.models.vnncomp_resnet import resnet2b as vnncomp_resnet2b, resnet4b as vnncomp_resnet4b
 from nnverify.training.models.model_defs import mnist_3_100, mnist_6_100, mnist_9_100, mnist_conv_small, mnist_conv_big
 from nnverify.training.models.cifar_resnet import resnet
+from nnverify.training.models.cifar10_fcnn import cifar10_6x500
 
 Models = {
     'mlp_2layer': mlp_2layer,
@@ -52,4 +53,5 @@ Models = {
     'mnist_conv_small_nat': mnist_conv_small,
     'mnist_conv_big_diffai': mnist_conv_big,
     'resnet_cifar': resnet,
+    'cifar10_6x500': cifar10_6x500
 }
