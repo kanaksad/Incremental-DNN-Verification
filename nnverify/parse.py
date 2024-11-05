@@ -50,6 +50,11 @@ def forward_layers_with_template(net, relu_mask, transformers, starting_layer, n
             transformers.handle_conv2d(net[current_layer])
         elif net[current_layer].type == LayerType.Normalization:
             transformers.handle_normalization(net[current_layer])
+    # lb = transformers.compute_lb()
+    # if torch.all(lb >= 0):
+    #     print("VERIFIED")
+    # else: 
+    #     print("UNKNOWN")
 
 # def forward_layers(net, relu_mask, transformers):
 #     #KD: add the logic here to see if we forward from here, is the property still verifiable

@@ -35,12 +35,12 @@ class Analyzer:
             self.template_store = TemplateStoreFANC()
 
     def analyze(self, prop):
-        self.update_transformer(prop)
-        tree_size = 1
-
         # Check if classified correctly
         if nnverify.attack.check_adversarial(prop.input, self.net, prop):
-            return Status.MISS_CLASSIFIED, tree_size
+            return Status.MISS_CLASSIFIED, 1
+        
+        self.update_transformer(prop)
+        tree_size = 1
 
         # Check Adv Example with an Attack
         if self.args.attack is not None:
