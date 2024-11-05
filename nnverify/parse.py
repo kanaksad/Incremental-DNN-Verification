@@ -1,4 +1,5 @@
 import torch
+import copy
 
 from torch.nn import ReLU, Linear, Conv2d
 from onnx import numpy_helper
@@ -12,9 +13,16 @@ def forward_layers(net, relu_mask, transformers):
     for i in range(lsize):
         if net[i].type == LayerType.ReLU:
             transformers.handle_relu(net[i], optimize=True, relu_mask=relu_mask)
-            forward_layers_with_template(net, relu_mask, transformers, i + 1, lsize)
-            transformers.cofs = transformers.cofs[:(i + 1)]
-            transformers.centers = transformers.centers[:(i + 1)]
+            # map_relu_layer_idx_to_layer_idx_temp = copy.deepcopy(transformers.map_relu_layer_idx_to_layer_idx)
+            # map_for_noise_indices_temp = copy.deepcopy(transformers.map_for_noise_indices)
+            # TODO: deepcopy can be expensive. should do it lightly. work on the commmented code.
+            forward_layers_with_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize)
+            # transformers.cofs = transformers.cofs[:(i + 1)]
+            # transformers.centers = transformers.centers[:(i + 1)]
+            # transformers.relu_layer_cofs = transformers.relu_layer_cofs[:(i + 1)]
+            # transformers.unstable_relus = transformers.unstable_relus[:(i + 1)]
+            # transformers.map_relu_layer_idx_to_layer_idx = map_relu_layer_idx_to_layer_idx_temp
+            # transformers.map_for_noise_indices = map_for_noise_indices_temp
         elif net[i].type == LayerType.Linear:
             if net[i] == net[-1]:
                 transformers.handle_linear(net[i], last_layer=True)
