@@ -6,20 +6,72 @@ from nnverify.common.network import Layer, LayerType, Network
 
 
 def forward_layers(net, relu_mask, transformers):
-    for layer in net:
-        if layer.type == LayerType.ReLU:
-            transformers.handle_relu(layer, optimize=True, relu_mask=relu_mask)
-        elif layer.type == LayerType.Linear:
-            if layer == net[-1]:
-                transformers.handle_linear(layer, last_layer=True)
+    #KD: add the logic here to see if we forward from here, is the property still verifiable
+    # list all the layers first
+    lsize = len(net)
+    for i in range(lsize):
+        if net[i].type == LayerType.ReLU:
+            transformers.handle_relu(net[i], optimize=True, relu_mask=relu_mask)
+            forward_layers_with_template(net, relu_mask, transformers, i + 1, lsize)
+            transformers.cofs = transformers.cofs[:(i + 1)]
+            transformers.centers = transformers.centers[:(i + 1)]
+        elif net[i].type == LayerType.Linear:
+            if net[i] == net[-1]:
+                transformers.handle_linear(net[i], last_layer=True)
             else:
-                transformers.handle_linear(layer)
-        elif layer.type == LayerType.Conv2D:
-            transformers.handle_conv2d(layer)
-        elif layer.type == LayerType.Normalization:
-            transformers.handle_normalization(layer)
+                transformers.handle_linear(net[i])
+        elif net[i].type == LayerType.Conv2D:
+            transformers.handle_conv2d(net[i])
+        elif net[i].type == LayerType.Normalization:
+            transformers.handle_normalization(net[i])
     return transformers
 
+"""
+create a copy of the transformer. forward everything from the layer told. 
+"""
+def forward_layers_with_template(net, relu_mask, transformers, starting_layer, network_layer_count, templates=None):
+    for current_layer in range(starting_layer, network_layer_count):
+        if net[current_layer].type == LayerType.ReLU:
+            transformers.handle_relu(net[current_layer], optimize=True, relu_mask=relu_mask)
+        elif net[current_layer].type == LayerType.Linear:
+            if net[current_layer] == net[-1]:
+                transformers.handle_linear(net[current_layer], last_layer=True)
+            else:
+                transformers.handle_linear(net[current_layer])
+        elif net[current_layer].type == LayerType.Conv2D:
+            transformers.handle_conv2d(net[current_layer])
+        elif net[current_layer].type == LayerType.Normalization:
+            transformers.handle_normalization(net[current_layer])
+
+# def forward_layers(net, relu_mask, transformers):
+#     #KD: add the logic here to see if we forward from here, is the property still verifiable
+#     # list all the layers first
+    
+#     for layer in net:
+#         if layer.type == LayerType.ReLU:
+#             transformers.handle_relu(layer, optimize=True, relu_mask=relu_mask)
+#         elif layer.type == LayerType.Linear:
+#             if layer == net[-1]:
+#                 transformers.handle_linear(layer, last_layer=True)
+#             else:
+#                 transformers.handle_linear(layer)
+#         elif layer.type == LayerType.Conv2D:
+#             transformers.handle_conv2d(layer)
+#         elif layer.type == LayerType.Normalization:
+#             transformers.handle_normalization(layer)
+#     return transformers
+"""
+create a template.
+"""
+
+
+"""
+check if the template holds.
+"""
+
+"""
+store the template if it
+"""
 
 def parse_onnx_layers(net):
     input_shape = [dim.dim_value for dim in net.graph.input[0].type.tensor_type.shape.dim]
