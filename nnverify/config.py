@@ -55,7 +55,7 @@ MNIST_DIFFAI_5_100_ALL_BLOCK = "mnist/diffai/model_fog_all_lr_1e-05_wd_0.0001_tr
 
 MNIST_PGD_6_500_1_FIRST_BLOCK = "mnist/pgd0.1/ffnnRELU__PGDK_w_0.1_6_500.onnx"
 MNIST_PGD_6_500_1_SECOND_BLOCK = "mnist/pgd0.1/ffnnRELU__PGDK_w_0.1_6_500.onnx"
-MNIST_PGD_6_500_1_THIRD_BLOCK = "mnist/pgd0.1/ffnnRELU__PGDK_w_0.1_6_500.onnx"
+MNIST_PGD_6_500_1_THIRD_BLOCK = "mnist/pgd0.3/model_fog_first_block_lr_1e-07_wd_1e-06_trainacc_0.4120_valacc_0.3620_testacc_0.3882.onnx"
 MNIST_PGD_6_500_1_FORTH_BLOCK = "mnist/pgd0.1/ffnnRELU__PGDK_w_0.1_6_500.onnx"
 MNIST_PGD_6_500_1_FIFTH_BLOCK = "mnist/pgd0.1/ffnnRELU__PGDK_w_0.1_6_500.onnx"
 MNIST_PGD_6_500_1_SIXTH_BLOCK = "mnist/pgd0.1/ffnnRELU__PGDK_w_0.1_6_500.onnx" 

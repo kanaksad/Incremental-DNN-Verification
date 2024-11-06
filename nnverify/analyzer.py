@@ -125,6 +125,7 @@ class Analyzer:
 
     def analyze_domain(self, props):
         results = Results(self.args)
+        template_counter = 0
         # lbs = []
         # ubs = []
         for i in range(len(props)):
@@ -139,12 +140,14 @@ class Analyzer:
 
             status = self.extract_status(clause_ver_status)
             print(status)
+            if(status != Status.MISS_CLASSIFIED and len(self.transformer.templates) > 0):
+                template_counter = template_counter + 1
             # print('LB: ', lb)
             # lbs.append(lb)
             # print('UB:', ub)
             # ubs.append(ub)
             ver_time = time.time() - ver_start_time
             results.add_result(Result(ver_time, status, tree_size=tree_size))
-
+        print("Templates found for: ", template_counter, "proofs")
         return results
 

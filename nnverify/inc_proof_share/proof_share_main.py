@@ -40,7 +40,6 @@ class ShareArgs:
 def proof_share(pt_args):
     # print("proof share initiated")
     res, res_pt = proof_transfer_analyze(pt_args)
-
     # speedup = compute_speedup(res, res_pt, pt_args)
     # print("Proof Transfer Speedup :", speedup)
     # plot_verification_results(res, res_pt, pt_args)

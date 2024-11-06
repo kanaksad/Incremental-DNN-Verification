@@ -9,6 +9,7 @@ from nnverify.common.network import Layer, LayerType, Network
 def forward_layers(net, relu_mask, transformers):
     #KD: add the logic here to see if we forward from here, is the property still verifiable
     # list all the layers first
+    templates = []
     lsize = len(net)
     for i in range(lsize):
         if net[i].type == LayerType.ReLU:
@@ -16,7 +17,9 @@ def forward_layers(net, relu_mask, transformers):
             # map_relu_layer_idx_to_layer_idx_temp = copy.deepcopy(transformers.map_relu_layer_idx_to_layer_idx)
             # map_for_noise_indices_temp = copy.deepcopy(transformers.map_for_noise_indices)
             # TODO: deepcopy can be expensive. should do it lightly. work on the commmented code.
-            forward_layers_with_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize)
+            if i <= (2*lsize / 3):
+                find_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize, templates)
+            
             # transformers.cofs = transformers.cofs[:(i + 1)]
             # transformers.centers = transformers.centers[:(i + 1)]
             # transformers.relu_layer_cofs = transformers.relu_layer_cofs[:(i + 1)]
@@ -32,12 +35,44 @@ def forward_layers(net, relu_mask, transformers):
             transformers.handle_conv2d(net[i])
         elif net[i].type == LayerType.Normalization:
             transformers.handle_normalization(net[i])
+    transformers.templates = templates
     return transformers
+
+"""
+create a template.
+"""
+def find_template(net, relu_mask, transformers, starting_layer, network_layer_count, templates=None):
+    # get a template
+    eps_cur = 1
+    while(eps_cur > 0.01):
+        copied_transformer = copy.deepcopy(transformers)
+        eps_cur /= 2
+        adjusted_lbs = copied_transformer.lbs[-1] - eps_cur
+        adjusted_ubs = copied_transformer.ubs[-1] + eps_cur
+        copied_transformer.ubs[-1] = adjusted_ubs
+        copied_transformer.lbs[-1] = adjusted_lbs
+        # see if the template can verify stuffs
+        forward_layers_with_template(net, relu_mask, copied_transformer, starting_layer, network_layer_count, templates)
+        lb = copied_transformer.compute_lb()
+        if torch.all(lb >= 0):
+            # print("VERIFIED Template")
+            template_detail = {
+                "layer": starting_layer,
+                "lb": copy.deepcopy(adjusted_lbs),
+                "ub": copy.deepcopy(adjusted_ubs),
+                "output_constraint": transformers.prop.out_constr
+            }
+            templates.append(template_detail)
+            break
+        # else: 
+            # print("UNKNOWN Template")
 
 """
 create a copy of the transformer. forward everything from the layer told. 
 """
 def forward_layers_with_template(net, relu_mask, transformers, starting_layer, network_layer_count, templates=None):
+    # get a template
+    # see if the template can verify stuffs
     for current_layer in range(starting_layer, network_layer_count):
         if net[current_layer].type == LayerType.ReLU:
             transformers.handle_relu(net[current_layer], optimize=True, relu_mask=relu_mask)
@@ -73,9 +108,6 @@ def forward_layers_with_template(net, relu_mask, transformers, starting_layer, n
 #         elif layer.type == LayerType.Normalization:
 #             transformers.handle_normalization(layer)
 #     return transformers
-"""
-create a template.
-"""
 
 
 """
