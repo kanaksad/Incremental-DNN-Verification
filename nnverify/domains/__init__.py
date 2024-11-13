@@ -9,7 +9,7 @@ from nnverify.parse import forward_layers
 from nnverify.util import is_lirpa_domain
 
 
-def get_domain_transformer(args, net, prop, complete=True):
+def get_domain_transformer(args, net, prop, complete=True, template_store=None):
     if args.domain == Domain.DEEPPOLY:
         transformer = DeeppolyTransformer(prop, complete=complete)
     elif args.domain == Domain.DEEPZ:
@@ -23,10 +23,10 @@ def get_domain_transformer(args, net, prop, complete=True):
     else:
         raise ValueError("Unexpected domain!")
 
-    return build_transformer(transformer, net, prop)
+    return build_transformer(transformer, net, prop, template_store=template_store)
 
 
-def build_transformer(transformer, net, prop, relu_mask=None):
+def build_transformer(transformer, net, prop, relu_mask=None, template_store=None):
     if type(transformer) in [LPTransformer, LirpaTransformer]:
         if net[-1].type != LayerType.Linear:
             raise ValueError("We assume that the last layer of the network is a Linear layer!")
@@ -34,6 +34,6 @@ def build_transformer(transformer, net, prop, relu_mask=None):
         return transformer
 
     # For all abstraction based domains
-    transformer = forward_layers(net, relu_mask, transformer)
+    transformer = forward_layers(net=net, relu_mask=relu_mask, transformers=transformer, template_store=template_store)
 
     return transformer

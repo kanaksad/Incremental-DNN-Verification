@@ -74,7 +74,7 @@ class Analyzer:
                 and prop.out_constr.constr_type == OutSpecType.LOCAL_ROBUST:
             self.transformer.update_input(prop)
         else:
-            self.transformer = get_domain_transformer(self.args, self.net, prop, complete=False)
+            self.transformer = get_domain_transformer(self.args, self.net, prop, complete=False, template_store=self.template_store)
 
     def analyze_no_split_adv_ex(self, prop):
         # TODO: handle feasibility
@@ -140,8 +140,8 @@ class Analyzer:
 
             status = self.extract_status(clause_ver_status)
             print(status)
-            if(status != Status.MISS_CLASSIFIED and len(self.transformer.templates) > 0):
-                template_counter = template_counter + 1
+            # if(status != Status.MISS_CLASSIFIED and len(self.transformer.templates) > 0):
+            #     template_counter = template_counter + 1
             # print('LB: ', lb)
             # lbs.append(lb)
             # print('UB:', ub)

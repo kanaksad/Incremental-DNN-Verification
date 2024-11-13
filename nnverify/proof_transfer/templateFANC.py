@@ -1,61 +1,61 @@
+import copy
+import torch
+
 class TemplateStoreFANC:
     def __init__(self):
+        # Map templates by layer and output constraint, with lists for multiple templates
         self.template_map = {}
 
-    def get_template(self, prop):
-        if prop in self.template_map:
-            return self.template_map[prop]
-        return None
+    def get_template(self, layer, output_constraint):
+        """
+        Retrieve all template details for a specific layer and output constraint.
+        """
+        layer_map = self.template_map.get(layer, None)
+        if layer_map is not None:
+            return layer_map.get(output_constraint, [])
+        return []
 
-    def add_tree(self, prop, root):
-        if prop not in self.template_map:
-            self.template_map[prop] = Template()
-        self.template_map[prop].set_tree(root)
+    def add_template_detail(self, layer, lb, ub, output_constraint, input):
+        """
+        Add a template detail indexed by layer and output constraint.
+        """
+        if layer not in self.template_map:
+            self.template_map[layer] = {}
+        if output_constraint not in self.template_map[layer]:
+            self.template_map[layer][output_constraint] = []
+        
+        # Append new template details to the list
+        self.template_map[layer][output_constraint].append({
+            "layer": layer,
+            "lb": copy.deepcopy(lb),
+            "ub": copy.deepcopy(ub),
+            "output_constraint": output_constraint,
+            "input": input
+        })
 
-    def get_leaf_nodes(self, prop):
-        if prop not in self.template_map:
-            raise ValueError("We expect that the leaf nodes are available.")
-        assert self.template_map[prop].proof_tree is not None
-        return self.template_map[prop].proof_tree.get_leaves()
+    def get_all_constraints_for_layer(self, layer):
+        """
+        Retrieve all templates for a given layer.
+        """
+        return self.template_map.get(layer, {})
+    
+    def contains(self, layer, lb, ub, output_constraint):
+        """
+        Check if a given lb and ub are contained within any template for the specified
+        layer and output constraint.
+        """
+        templates = self.get_template(layer, output_constraint)
 
-    def get_proof_tree(self, prop):
-        if prop not in self.template_map:
-            raise ValueError("We expect that the leaf nodes are available.")
-        return self.template_map[prop].proof_tree
+        # Iterate over each template to check containment
+        for template in templates:
+            template_lb = template["lb"]
+            template_ub = template["ub"]
 
-    # Remove this as split scores will also be part of proof tree now
-    def add_split_scores(self, prop, observed_split_score):
-        if prop not in self.template_map:
-            self.template_map[prop] = Template()
-        self.template_map[prop].relu_score = observed_split_score
+            # Check if lb and ub are contained within template_lb and template_ub
+            lb_within = torch.all(lb >= template_lb)
+            ub_within = torch.all(ub <= template_ub)
 
-    def get_split_score(self, prop, chosen_split):
-        if prop in self.template_map and chosen_split in self.template_map[prop].relu_score:
-            return self.template_map[prop].relu_score[chosen_split]
-        return None
+            if lb_within and ub_within:
+                return True  # Contained within this template
 
-    def is_tree_available(self, prop):
-        if prop in self.template_map and self.template_map[prop].proof_tree is not None:
-            return True
-        return False
-
-
-class Template:
-    """
-    @field final_specs: this captures the final split nodes (leaves of the binary tree) that were not split further
-        during the verification
-
-    @field relu_score: this captures the effectiveness of relu split
-    """
-    def __init__(self):
-        self.relu_score = {}
-        self.proof_tree = None
-
-    def set_tree(self, root):
-        self.proof_tree = root
-
-    def get_split_score(self, relu):
-        if relu in self.relu_score:
-            return self.relu_score[relu]
-        return None
-
+        return False  # Not contained within any template
