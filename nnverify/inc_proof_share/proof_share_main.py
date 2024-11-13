@@ -101,7 +101,7 @@ def proof_transfer_analyze(pt_args):
     # res_pt = Analyzer(approx_args, net=approx_net, template_store=template_store).run_analyzer()
     # Compute results without any template store as the baseline
     #KD: use template store once established
-    res_tuned = Analyzer(tuned_args).run_analyzer()
+    res_tuned = Analyzer(tuned_args, template_store=template_store_fanc, reuse=True).run_analyzer()
     return res_org, res_tuned
 
 

@@ -59,3 +59,14 @@ class TemplateStoreFANC:
                 return True  # Contained within this template
 
         return False  # Not contained within any template
+    def print_map_size(self):
+        """
+        Print the total number of templates stored in the map and the distribution by layer.
+        """
+        total_count = 0
+        for layer, constraint_map in self.template_map.items():
+            layer_count = sum(len(templates) for templates in constraint_map.values())
+            total_count += layer_count
+            print(f"Layer {layer} has {layer_count} templates.")
+
+        print(f"Total templates stored: {total_count}")

@@ -6,11 +6,14 @@ from onnx import numpy_helper
 from nnverify.common.network import Layer, LayerType, Network
 
 
-def forward_layers(net, relu_mask, transformers, template_store=None):
+def forward_layers(net, relu_mask, transformers, template_store=None, reuse=False):
     #KD: add the logic here to see if we forward from here, is the property still verifiable
     # list all the layers first
     lsize = len(net)
     for i in range(lsize):
+        if reuse: 
+            if template_store.contains(i, transformers.lbs[-1], transformers.ubs[-1], transformers.prop.out_constr.label.item()):
+                print("reuse found!!!!!!")
         if net[i].type == LayerType.ReLU:
             transformers.handle_relu(net[i], optimize=True, relu_mask=relu_mask)
             # map_relu_layer_idx_to_layer_idx_temp = copy.deepcopy(transformers.map_relu_layer_idx_to_layer_idx)
@@ -33,7 +36,7 @@ def forward_layers(net, relu_mask, transformers, template_store=None):
             transformers.handle_conv2d(net[i])
         elif net[i].type == LayerType.Normalization:
             transformers.handle_normalization(net[i])
-        if i in transformers.prop.k:
+        if i in transformers.prop.k and not reuse:
             find_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize, template_store)
     return transformers
 
@@ -54,7 +57,7 @@ def find_template(net, relu_mask, transformers, starting_layer, network_layer_co
         forward_layers_with_template(net, relu_mask, copied_transformer, starting_layer, network_layer_count, template_store)
         lb = copied_transformer.compute_lb()
         if torch.all(lb >= 0):
-            template_store.add_template_detail(layer=starting_layer-1, lb=copy.deepcopy(adjusted_lbs), ub=copy.deepcopy(adjusted_ubs), output_constraint=transformers.prop.out_constr, input=transformers.prop.input)
+            template_store.add_template_detail(layer=starting_layer, lb=copy.deepcopy(adjusted_lbs), ub=copy.deepcopy(adjusted_ubs), output_constraint=transformers.prop.out_constr.label.item(), input=transformers.prop.input)
             break
         # else: 
             # print("UNKNOWN Template")

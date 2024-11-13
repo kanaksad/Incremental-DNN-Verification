@@ -16,7 +16,7 @@ from nnverify.domains import build_transformer, get_domain_transformer
 
 
 class Analyzer:
-    def __init__(self, args, net=None, template_store=None):
+    def __init__(self, args, net=None, template_store=None, reuse=False):
         """
         @param args: configuration arguments for the analyzer such as the network, domain, dataset, attack, count, dataset,
             epsilon and split
@@ -28,6 +28,7 @@ class Analyzer:
         self.device = config.DEVICE
         self.transformer = None
         self.init_time = None
+        self.reuse = reuse
 
         if self.net is None:
             self.net = util.get_net(self.args.net, self.args.dataset)
@@ -74,7 +75,7 @@ class Analyzer:
                 and prop.out_constr.constr_type == OutSpecType.LOCAL_ROBUST:
             self.transformer.update_input(prop)
         else:
-            self.transformer = get_domain_transformer(self.args, self.net, prop, complete=False, template_store=self.template_store)
+            self.transformer = get_domain_transformer(self.args, self.net, prop, complete=False, template_store=self.template_store, reuse=self.reuse)
 
     def analyze_no_split_adv_ex(self, prop):
         # TODO: handle feasibility
@@ -125,7 +126,6 @@ class Analyzer:
 
     def analyze_domain(self, props):
         results = Results(self.args)
-        template_counter = 0
         # lbs = []
         # ubs = []
         for i in range(len(props)):
@@ -148,6 +148,6 @@ class Analyzer:
             # ubs.append(ub)
             ver_time = time.time() - ver_start_time
             results.add_result(Result(ver_time, status, tree_size=tree_size))
-        print("Templates found for: ", template_counter, "proofs")
+        self.template_store.print_map_size()
         return results
 
