@@ -17,7 +17,8 @@ def forward_layers(net, relu_mask, transformers):
             # map_relu_layer_idx_to_layer_idx_temp = copy.deepcopy(transformers.map_relu_layer_idx_to_layer_idx)
             # map_for_noise_indices_temp = copy.deepcopy(transformers.map_for_noise_indices)
             # TODO: deepcopy can be expensive. should do it lightly. work on the commmented code.
-            if i <= (2*lsize / 3):
+            # if i <= (2*lsize / 3):
+            if i in transformers.prop.k:
                 find_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize, templates)
             
             # transformers.cofs = transformers.cofs[:(i + 1)]
@@ -44,9 +45,9 @@ create a template.
 def find_template(net, relu_mask, transformers, starting_layer, network_layer_count, templates=None):
     # get a template
     eps_cur = 1
-    while(eps_cur > 0.01):
+    while(eps_cur > 0.001):
         copied_transformer = copy.deepcopy(transformers)
-        eps_cur /= 2
+        eps_cur = (2*eps_cur)/3
         adjusted_lbs = copied_transformer.lbs[-1] - eps_cur
         adjusted_ubs = copied_transformer.ubs[-1] + eps_cur
         copied_transformer.ubs[-1] = adjusted_ubs

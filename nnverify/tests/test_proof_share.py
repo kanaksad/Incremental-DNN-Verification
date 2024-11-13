@@ -14,7 +14,7 @@ from nnverify.smoothing.code.predict import SmoothingAnalyzer, SmoothingArgs
         
 class TestMNISTIncremental(TestCase):
     def test_mnist_base_diffai(self):
-        args = ps.ShareArgs(net=config.MNIST_PGD_6_500_3, tuned_net=config.MNIST_PGD_6_500_3_THIRD_BLOCK, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0003, k = 3)
+        args = ps.ShareArgs(net=config.MNIST_PGD_6_500_3, tuned_net=config.MNIST_PGD_6_500_3_THIRD_BLOCK, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.001, k = [3,5,7])
         ps.proof_share(args)
         # args = config.Args(net=config.MNIST_PGD_6_500_3, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0003, k = 3)
         # Analyzer(args).run_analyzer()

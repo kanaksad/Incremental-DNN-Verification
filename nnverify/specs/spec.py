@@ -165,14 +165,14 @@ def score_relu_esip2(zono_transformer):
     return relu_score
 
 
-def get_specs(dataset, spec_type=InputSpecType.LINF, eps=0.01, count=None):
+def get_specs(dataset, spec_type=InputSpecType.LINF, eps=0.01, count=None, k=None):
     if dataset == Dataset.MNIST or dataset == Dataset.CIFAR10:
         if spec_type == InputSpecType.LINF:
             if count is None:
                 count = 100
             testloader = prepare_data(dataset, batch_size=count)
             inputs, labels = next(iter(testloader))
-            props = get_linf_spec(inputs, labels, eps, dataset)
+            props = get_linf_spec(inputs, labels, eps, dataset, k)
         elif spec_type == InputSpecType.L2:
             if count is None:
                 count = 100
@@ -231,7 +231,7 @@ def get_acas_props(count):
     return props
 
 
-def get_linf_spec(inputs, labels, eps, dataset):
+def get_linf_spec(inputs, labels, eps, dataset, k):
     properties = []
 
     for i in range(len(inputs)):
@@ -250,7 +250,7 @@ def get_linf_spec(inputs, labels, eps, dataset):
         iub = iub.reshape(-1)
 
         out_constr = Constraint(OutSpecType.LOCAL_ROBUST, label=labels[i])
-        properties.append(Property(ilb, iub, InputSpecType.LINF, out_constr, dataset, input=image))
+        properties.append(Property(ilb, iub, InputSpecType.LINF, out_constr, dataset, input=image, k=k))
 
     return properties
 

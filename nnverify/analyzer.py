@@ -103,7 +103,7 @@ class Analyzer:
         """
         print('Using %s abstract domain' % self.args.domain)
 
-        props, inputs = specs.get_specs(self.args.dataset, spec_type=self.args.spec_type, count=self.args.count, eps=self.args.eps)
+        props, inputs = specs.get_specs(self.args.dataset, spec_type=self.args.spec_type, count=self.args.count, eps=self.args.eps, k=self.args.k)
 
         results = self.analyze_domain(props)
         # lbs_ubs = {'lbs': lbs, 'ubs': ubs}

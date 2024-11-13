@@ -3,25 +3,26 @@ from nnverify.specs.out_spec import OutSpecType
 
 
 class Property:
-    def __init__(self, input_lbs, input_ubs, inp_type, out_constr, dataset, input=None):
+    def __init__(self, input_lbs, input_ubs, inp_type, out_constr, dataset, input=None, k=None):
         if inp_type == InputSpecType.LINF or inp_type == InputSpecType.L2:
-            self.input_specs = [InputSpec(input_lbs, input_ubs, out_constr, dataset, input=input)]
+            self.input_specs = [InputSpec(input_lbs, input_ubs, out_constr, dataset, input=input, k=k)]
         # Since the properties in this case can be conjunctive
         elif inp_type == InputSpecType.PATCH:
             self.input_specs = []
             for i in range(len(input_lbs)):
-                self.input_specs.append(InputSpec(input_lbs[i], input_ubs[i], out_constr, dataset, input=input))
+                self.input_specs.append(InputSpec(input_lbs[i], input_ubs[i], out_constr, dataset, input=input, k=k))
         elif inp_type == InputSpecType.GLOBAL:
             # A property may contain multiple clauses
             self.input_specs = []
             for i in range(len(input_lbs)):
-                self.input_specs.append(InputSpec(input_lbs[i], input_ubs[i], out_constr[i], dataset))
+                self.input_specs.append(InputSpec(input_lbs[i], input_ubs[i], out_constr[i], dataset, k=k))
         else:
             raise ValueError("Unsupported Input property type!")
 
         self.inp_type = inp_type
         self.out_constr = out_constr
         self.dataset = dataset
+        self.k = k
 
     def is_local_robustness(self):
         return self.out_constr.constr_type == OutSpecType.LOCAL_ROBUST

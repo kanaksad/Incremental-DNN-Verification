@@ -18,11 +18,12 @@ class InputSpecType(Enum):
 
 
 class InputSpec(object):
-    def __init__(self, input_lb, input_ub, out_constr, dataset, input=None):
+    def __init__(self, input_lb, input_ub, out_constr, dataset, input=None, k=None):
         self.input_lb = input_lb
         self.input_ub = input_ub
         self.out_constr = out_constr
         self.dataset = dataset
+        self.k = k
         if input is not None:
             self.input = input.flatten()
         else:
