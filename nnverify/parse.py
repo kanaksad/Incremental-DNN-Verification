@@ -18,8 +18,6 @@ def forward_layers(net, relu_mask, transformers):
             # map_for_noise_indices_temp = copy.deepcopy(transformers.map_for_noise_indices)
             # TODO: deepcopy can be expensive. should do it lightly. work on the commmented code.
             # if i <= (2*lsize / 3):
-            if i in transformers.prop.k:
-                find_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize, templates)
             
             # transformers.cofs = transformers.cofs[:(i + 1)]
             # transformers.centers = transformers.centers[:(i + 1)]
@@ -36,6 +34,8 @@ def forward_layers(net, relu_mask, transformers):
             transformers.handle_conv2d(net[i])
         elif net[i].type == LayerType.Normalization:
             transformers.handle_normalization(net[i])
+        if i in transformers.prop.k:
+            find_template(net, relu_mask, copy.deepcopy(transformers), i + 1, lsize, templates)
     transformers.templates = templates
     return transformers
 
@@ -58,10 +58,11 @@ def find_template(net, relu_mask, transformers, starting_layer, network_layer_co
         if torch.all(lb >= 0):
             # print("VERIFIED Template")
             template_detail = {
-                "layer": starting_layer,
+                "layer": starting_layer - 1,
                 "lb": copy.deepcopy(adjusted_lbs),
                 "ub": copy.deepcopy(adjusted_ubs),
-                "output_constraint": transformers.prop.out_constr
+                "output_constraint": transformers.prop.out_constr,
+                "input": transformers.prop.input
             }
             templates.append(template_detail)
             break
