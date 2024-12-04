@@ -14,7 +14,7 @@ def check_adversarial(adv_ex, net, prop):
     """
     if adv_ex is None:
         return False
-
+    net.torch_net.eval()
     # sanity check adv example
     adv_ex = adv_ex.clone().detach()
 

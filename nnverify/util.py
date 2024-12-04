@@ -42,7 +42,9 @@ def get_torch_net(net_file, dataset, device='cpu'):
         return get_torch_test_net(net_name, net_file)
 
     if dataset == Dataset.MNIST:
-        if 'mnist_relu_9_100' in net_name or net_name == 'mnist_relu_3_100':
+        if net_name == 'mnist-3':
+            model = torch.load(net_file, map_location=torch.device(device))     
+        elif 'mnist_relu_9_100' in net_name or net_name == 'mnist_relu_3_100':
             model = models.Models[net_name]()
         else:
             model = models.Models[net_name](in_ch=1, in_dim=28)
@@ -237,6 +239,8 @@ def get_net_format(net_name):
         net_format = 'torch'
     if 'onnx' in net_name:
         net_format = 'onnx'
+    if 'pynet' in net_name:
+        net_format = 'pynet'
     return net_format
 
 
@@ -257,6 +261,8 @@ def get_net(net_name, dataset):
     elif net_format == 'onnx':
         net_onnx = onnx.load(net_name)
         net = parse.parse_onnx_layers(net_onnx)
+    elif net_format == 'pynet':
+        print("here")
     else:
         raise ValueError("Unsupported net format!")
 

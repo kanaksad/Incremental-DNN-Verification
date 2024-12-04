@@ -14,12 +14,20 @@ from nnverify.smoothing.code.predict import SmoothingAnalyzer, SmoothingArgs
         
 class TestMNISTIncremental(TestCase):
     def test_with_exp_losses(self):
-        import torch
-        model = torch.load('nnverify/nets/sota/mnist-1.pth', map_location="cuda:0")
-        print("hi")
+        # import torch
+        # model = torch.load('nnverify/nets/sota/mnist-0.3-mtlibp.pt', map_location="cpu")
+        # print("hi")
         
-        # args = ps.ShareArgs(net=config.MNIST_CNN_7_1_CCIBP, tuned_net=config.MNIST_CNN_7_1_CCIBP, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.1, k = [6], count=100)
+        # args = ps.ShareArgs(net=config.MNIST_CROWN_IBP, tuned_net=config.MNIST_CROWN_IBP, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.3, k = [], count=10000)
         # res_fst = Analyzer(args, reuse=True).run_analyzer()
+        args = ps.ShareArgs(net=config.MNIST_CROWN_IBP_01, tuned_net=config.MNIST_CROWN_IBP_01, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.1, k = [], count=10000)
+        res_fst = Analyzer(args, reuse=True).run_analyzer()
+        args = ps.ShareArgs(net=config.MNIST_CROWN_IBP_02, tuned_net=config.MNIST_CROWN_IBP_02, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.2, k = [], count=10000)
+        res_fst = Analyzer(args, reuse=True).run_analyzer()
+        args = ps.ShareArgs(net=config.MNIST_CROWN_IBP_03, tuned_net=config.MNIST_CROWN_IBP_03, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.3, k = [], count=10000)
+        res_fst = Analyzer(args, reuse=True).run_analyzer()
+        args = ps.ShareArgs(net=config.MNIST_CROWN_IBP_04, tuned_net=config.MNIST_CROWN_IBP_04, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.4, k = [], count=10000)
+        res_fst = Analyzer(args, reuse=True).run_analyzer()
 
     # def test_mnist_base_diffai(self):
     #     args = ps.ShareArgs(net=config.MNIST_DIFFAI_5_100, tuned_net=config.MNIST_DIFFAI_5_100, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.03, k = [6], count=1000)
@@ -28,8 +36,8 @@ class TestMNISTIncremental(TestCase):
         # Analyzer(args).run_analyzer()
     
     def test1(self):
-        args = ps.ShareArgs(net=config.MNIST_DIFFAI_5_100, tuned_net=config.MNIST_DIFFAI_5_100, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.1, k = [6], count=100)
-        res_fst = Analyzer(args, reuse=True).run_analyzer()
+        args = ps.ShareArgs(net=config.MNIST_DIFFAI_5_100, tuned_net=config.MNIST_DIFFAI_5_100, domain=Domain.BOX, dataset=Dataset.MNIST, eps=.3, k = [6], count=100)
+        res_fst = Analyzer(args, reuse=False).run_analyzer()
     
     def test2(self):
         args = ps.ShareArgs(net=config.MNIST_DIFFAI_5_100, tuned_net=config.MNIST_DIFFAI_5_100, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.005, k = [6], count=10000)
