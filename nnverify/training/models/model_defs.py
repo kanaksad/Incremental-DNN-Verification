@@ -503,6 +503,28 @@ def mnist_cnn_4layer():
         nn.ReLU(),
         nn.Linear(100, 10),
     )
+    
+def cnn_7layer_bn2(in_ch=3, in_dim=32, width=64, linear_size=512, num_class=10):
+    model = nn.Sequential(
+        nn.Conv2d(in_ch, width, 3, stride=1, padding=1),
+        nn.BatchNorm2d(width),
+        nn.ReLU(),
+        nn.Conv2d(width, width, 3, stride=1, padding=1),
+        nn.BatchNorm2d(width),
+        nn.ReLU(),
+        nn.Conv2d(width, 2 * width, 3, stride=2, padding=1),
+        nn.BatchNorm2d(2 * width),
+        nn.ReLU(),
+        nn.Conv2d(2 * width, 2 * width, 3, stride=1, padding=1),
+        nn.BatchNorm2d(2 * width),
+        nn.ReLU(),
+        Flatten(),
+        nn.Linear((in_dim//2) * (in_dim//2) * 2 * width, linear_size),
+        nn.BatchNorm1d(linear_size),
+        nn.ReLU(),
+        nn.Linear(linear_size, num_class)
+    )
+    return model
 
 def cifar_conv_small():
     model = nn.Sequential(
@@ -597,6 +619,7 @@ def mnist_conv_small(in_ch=1, in_dim=28):
         nn.Linear(100, 10)
     )
     return model
+
 
 def mnist_conv_big(in_ch=1, in_dim=28):
     model = nn.Sequential(

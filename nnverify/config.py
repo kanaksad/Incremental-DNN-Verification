@@ -45,7 +45,10 @@ MNIST_FFN_L2 = "mnist-net_256x2.onnx"  # 512 neurons
 MNIST_FFN_L4 = "mnist-net_256x4.onnx"   # 1024 neurons
 MNIST_FFN_torch1 = "cpt/fc1.pt"
 
-MNIST_DIFFAI_5_100 = "mnist/diffai/mnist_relu_5_100.onnx" 
+
+MNIST_CNN_7_1_CCIBP = "sota/mnist-01-ccibp.pt"
+
+MNIST_DIFFAI_5_100 = "mnist/convBigRELU__DiffAI.onnx" 
 MNIST_DIFFAI_5_100_FIRST_BLOCK = "mnist/diffai/model_fog_first_block_lr_1e-05_wd_0.0001_trainacc_0.9280_valacc_0.9190_testacc_0.9127.onnx" 
 MNIST_DIFFAI_5_100_SECOND_BLOCK = "mnist/diffai/model_fog_second_block_lr_1e-05_wd_0.0001_trainacc_0.9790_valacc_0.9200_testacc_0.9286.onnx"
 MNIST_DIFFAI_5_100_THIRD_BLOCK = "mnist/diffai/model_fog_third_block_lr_1e-05_wd_0.0001_trainacc_0.9810_valacc_0.9230_testacc_0.9295.onnx"

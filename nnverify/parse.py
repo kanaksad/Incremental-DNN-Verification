@@ -11,9 +11,15 @@ def forward_layers(net, relu_mask, transformers, template_store=None, reuse=Fals
     # list all the layers first
     lsize = len(net)
     for i in range(lsize):
+        # if i == 6 and reuse: 
+            # print("debug")
         if reuse: 
-            if template_store.contains(i, transformers.lbs[-1], transformers.ubs[-1], transformers.prop.out_constr.label.item()):
-                print("reuse found!!!!!!")
+            if template_store.contains(i, transformers.lbs[-1], transformers.ubs[-1], transformers.prop.out_constr.label.item(), input=transformers.prop.input):
+                # print("reuse found!!!!!!")
+                transformers.lbs.append(torch.ones(10))
+                transformers.ubs.append(torch.ones(10))
+                # print("nicce")
+                return transformers
         if net[i].type == LayerType.ReLU:
             transformers.handle_relu(net[i], optimize=True, relu_mask=relu_mask)
             # map_relu_layer_idx_to_layer_idx_temp = copy.deepcopy(transformers.map_relu_layer_idx_to_layer_idx)
@@ -28,8 +34,9 @@ def forward_layers(net, relu_mask, transformers, template_store=None, reuse=Fals
             # transformers.map_relu_layer_idx_to_layer_idx = map_relu_layer_idx_to_layer_idx_temp
             # transformers.map_for_noise_indices = map_for_noise_indices_temp
         elif net[i].type == LayerType.Linear:
-            if net[i] == net[-1]:
+            if net[i] == net[-1] or (net[i] == net[-2] and net[-1].type == LayerType.ReLU):
                 transformers.handle_linear(net[i], last_layer=True)
+                break
             else:
                 transformers.handle_linear(net[i])
         elif net[i].type == LayerType.Conv2D:
@@ -46,9 +53,9 @@ create a template.
 def find_template(net, relu_mask, transformers, starting_layer, network_layer_count, template_store=None):
     # get a template
     eps_cur = 1
-    while(eps_cur > 0.001):
+    while(eps_cur > 0.00001):
         copied_transformer = copy.deepcopy(transformers)
-        eps_cur = (2*eps_cur)/3
+        eps_cur = eps_cur / 2
         adjusted_lbs = copied_transformer.lbs[-1] - eps_cur
         adjusted_ubs = copied_transformer.ubs[-1] + eps_cur
         copied_transformer.ubs[-1] = adjusted_ubs
@@ -72,8 +79,9 @@ def forward_layers_with_template(net, relu_mask, transformers, starting_layer, n
         if net[current_layer].type == LayerType.ReLU:
             transformers.handle_relu(net[current_layer], optimize=True, relu_mask=relu_mask)
         elif net[current_layer].type == LayerType.Linear:
-            if net[current_layer] == net[-1]:
+            if net[current_layer] == net[-1] or (net[current_layer] == net[-2] and net[-1].type == LayerType.ReLU):
                 transformers.handle_linear(net[current_layer], last_layer=True)
+                break
             else:
                 transformers.handle_linear(net[current_layer])
         elif net[current_layer].type == LayerType.Conv2D:

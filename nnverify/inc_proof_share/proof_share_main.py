@@ -86,6 +86,8 @@ def proof_transfer_acas(pt_args):
 
 def proof_transfer_analyze(pt_args):
     args = pt_args.get_verification_arg(net=None)
+
+    res_fst = Analyzer(args, reuse=True).run_analyzer()
     analyzer = Analyzer(args)
     # run analyzer until layer k
     # create templates that can verify the properties

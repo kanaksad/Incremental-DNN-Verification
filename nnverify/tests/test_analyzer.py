@@ -16,7 +16,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 class TestMNISTBox(TestCase):
     # 85% accuracy here with eps=0? Why is it not same as deepz/deeppoly
     def test_mlp_box_torch1(self):
-        args = config.Args(net=config.MNIST_FFN_torch1, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0)
+        args = config.Args(net=config.MNIST_FFN_torch1, domain=Domain.BOX, dataset=Dataset.MNIST, eps=0.0, k = [])
         Analyzer(args).run_analyzer()
 
     # ~100% accuracy here with eps=0?

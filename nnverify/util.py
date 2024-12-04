@@ -78,8 +78,8 @@ def get_torch_net(net_file, dataset, device='cpu'):
 def get_net_name(net_file):
     if 'pth.tar' in net_file:
         net_name = net_file.split('/')[-1].split('_')[0]
-    elif 'model_brightness_' or 'ffnnRELU__PGDK_w_0.0078_6_500' in net_file:
-        net_name = 'cifar10_6x500'
+    # elif 'model_brightness_' or 'ffnnRELU__PGDK_w_0.0078_6_500' in net_file:
+    #     net_name = 'cifar10_6x500'
     else:
         net_name = net_file.split('/')[-1].split('.')[-2]
     return net_name

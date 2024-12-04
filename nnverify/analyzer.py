@@ -38,7 +38,7 @@ class Analyzer:
     def analyze(self, prop):
         # Check if classified correctly
         if nnverify.attack.check_adversarial(prop.input, self.net, prop):
-            return Status.MISS_CLASSIFIED, 1
+            return Status.MISS_CLASSIFIED, 1, False
         
         self.update_transformer(prop)
         tree_size = 1
@@ -47,14 +47,15 @@ class Analyzer:
         if self.args.attack is not None:
             adv = self.args.attack.search_adversarial(self.net, prop, self.args)
             if nnverify.attack.check_adversarial(adv, self.net, prop):
-                return Status.ADV_EXAMPLE, tree_size
+                return Status.ADV_EXAMPLE, tree_size, False
 
         if self.args.split is None:
-            status = self.analyze_no_split()
+            status, isHit = self.analyze_no_split(self.template_store)
             # if status is verified, take bounds at layer k and see if we can create a template from it.
             
-            print(self.transformer)
+            # print(self.transformer)
             # print('UB:', ub)
+            return status, tree_size, isHit
         elif self.args.split is None:
             status = self.analyze_no_split_adv_ex(prop)
         else:
@@ -68,7 +69,7 @@ class Analyzer:
             tree_size = bnb_analyzer.tree_size
             # lb = bnb_analyzer.transformer.lower_bounds[-1]
             # ub = bnb_analyzer.transformer.upper_bounds[-1]
-        return status, tree_size
+        return status, tree_size, False
 
     def update_transformer(self, prop):
         if self.transformer is not None and 'update_input' in dir(self.transformer) \
@@ -88,14 +89,17 @@ class Analyzer:
         # print(lb)
         return status
 
-    def analyze_no_split(self):
+    def analyze_no_split(self, template_store):
         lb = self.transformer.compute_lb()
         status = Status.UNKNOWN
         if torch.all(lb >= 0):
             status = Status.VERIFIED
+            if(torch.all(lb == 1).item() == True):
+                return status, True
         # print('LB: ', lb)
         # print('UB:', self.transformer.compute_ub())
-        return status
+        
+        return status, False
 
     def run_analyzer(self):
         """
@@ -128,18 +132,22 @@ class Analyzer:
         results = Results(self.args)
         # lbs = []
         # ubs = []
+        total_time = 0
+        hit_counts = 0
         for i in range(len(props)):
-            print("************************** Proof %d *****************************" % (i+1))
+            # print("************************** Proof %d *****************************" % (i+1))
             num_clauses = props[i].get_input_clause_count()
             clause_ver_status = []
             ver_start_time = time.time()
             # print('Number of clauses: ', num_clauses)
             for j in range(num_clauses):
-                cl_status, tree_size = self.analyze(props[i].get_input_clause(j))
+                cl_status, tree_size, isHit = self.analyze(props[i].get_input_clause(j))
                 clause_ver_status.append(cl_status)
+                if isHit: 
+                    hit_counts += 1
 
             status = self.extract_status(clause_ver_status)
-            print(status)
+            # print(status)
             # if(status != Status.MISS_CLASSIFIED and len(self.transformer.templates) > 0):
             #     template_counter = template_counter + 1
             # print('LB: ', lb)
@@ -147,7 +155,10 @@ class Analyzer:
             # print('UB:', ub)
             # ubs.append(ub)
             ver_time = time.time() - ver_start_time
+            total_time += ver_time
             results.add_result(Result(ver_time, status, tree_size=tree_size))
         self.template_store.print_map_size()
+        print("Total Cache Hits: ", hit_counts)
+        print("Total time taken: ", total_time)
         return results
 
